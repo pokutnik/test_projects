@@ -1,6 +1,10 @@
-
-r = lambda x: x % 1410000017  # round by modulo
-
+ten_power = [1]  # cache table for 10 ** i
+def warmup(n):
+    if(n > len(ten_power)):
+        d = ten_power[-1]
+        for i in xrange(len(ten_power),n):
+            d *= 10
+            ten_power.append(d)
 
 
 def Z9(l):
@@ -16,7 +20,7 @@ def Z9(l):
                       0     /       
 
     """
-    z9 = sum(r(9 * i * (10 ** (i-1))) for i in xrange(1, l) ) + 1
+    z9 = sum(9 * i * (ten_power[i-1]) for i in xrange(1, l) ) + 1
     return z9
 
 def zeros_part(k,l):
@@ -33,9 +37,9 @@ def zeros_part(k,l):
                       0     /
     """
     assert k > 0
-    s = (k-1) * l * 10 ** (l-1) if l else 0
+    s = (k-1) * l * ten_power[l-1] if l else 0
     z9 = Z9(l)
-    return r(z9 + s)
+    return z9 + s
 
 def zeros_leading(S):
     """ Calculate including leading zeros """
@@ -48,18 +52,17 @@ def zeros_leading(S):
             s = int(S[i:] or 0) + 1
         else:
             l = L - i - 1
-            s = k * l * (10 ** (l-1)) + 10 ** l if l else 1
-        zl = r(zl + s)
+            s = k * l * ten_power[l-1] + ten_power[l] if l else 1
+        zl = zl + s
     return zl
 
 def number_of_zeros(S):
-    #return direct(S)
     l = len(S)-1
-    #print '>>> ', S
+    warmup(l)
     part = zeros_part(int(S[0]), l)
-    full =  zeros_leading(S[1:])
-    #print "S = ", part+full, " part=", part, " full=", full
-    return part + full
+    leading =  zeros_leading(S[1:])
+    total = part + leading
+    return total % 1410000017
     
 
 def direct(S):
@@ -69,6 +72,7 @@ def direct(S):
     return sum(zeros(i) for i in xrange(N+1))
 
 if __name__ == "__main__":
+    warmup(10000)
     assert Z9(0) == 1
     assert Z9(1) == 1 
     assert Z9(2) == 10
@@ -128,16 +132,7 @@ if __name__ == "__main__":
     #print number_of_zeros("5032122554650699999999999989898787987987987989898985")
 
     import timeit
-    # t = timeit.Timer("""
-    #   number_of_zeros("1234567890"*1000) # 10k digit number
-    # """, "from zeros import number_of_zeros")
-    # print "t =", t.timeit(1)
-
-    # t = timeit.Timer("""
-    #   cache = []
-    #   d = 1
-    #   for i in xrange(1000):
-    #       cache.append(i*d)
-    #       d *= 10
-    # """)
-    # print "t =", t.timeit(1000)
+    t = timeit.Timer("""
+      number_of_zeros("1234567890"*1000) # 10k digit number
+    """, "from zeros import number_of_zeros")
+    print 't("1234567890"*1000) =', t.timeit(1) # ~ 3.7 seconds
