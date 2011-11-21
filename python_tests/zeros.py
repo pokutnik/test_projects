@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     import timeit
     t = timeit.Timer("""
-      number_of_zeros("1234567890"*1000) # 10k digit number
-    """, "from zeros import number_of_zeros")
-    print 'time to calculate zeros in "1234567890"*1000 =', t.timeit(1)
-    # ~ 3.7 - 1.4 seconds on i3 processor laptop
+      number_of_zeros(S)
+    """, "from zeros import number_of_zeros; S = '1234567890'*1000")
+    print 'time to calculate with L=10000 %f seconds' % t.timeit(1)
+    # ~ 1.5 seconds on i3 processor laptop
