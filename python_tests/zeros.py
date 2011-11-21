@@ -84,14 +84,22 @@ def zeros_part(k,l):
     return z9 + s
 
 def zeros_leading(S):
-    """ Calculate zeros including leading zeros """
+    """ Calculate zeros including leading zeros 
+        
+        0 0 ... x y z
+             .
+             .
+             .
+        0 0 ... 0 0 1
+        0 0 ... 0 0 0
+    """
     L = len(S)
     zl = 0
     s = 0
     for i, K in enumerate(S):
         k = int(K)
         if k == 0:
-            s = int(S[i:] or 0) + 1
+            s = int(S[i:] or 0) % modulo + 1
         else:
             l = L - i - 1
             s = k * l * ten_power[l-1] + ten_power[l] if l else 1
