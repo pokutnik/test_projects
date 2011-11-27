@@ -8,7 +8,7 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase, Client
 
 
-class IndexView(TestCase):
+class ViewsTestCase(TestCase):
     def test_404(self):
         c = Client()
         res = c.get('/non-existing-page')
