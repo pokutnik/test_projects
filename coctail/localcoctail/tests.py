@@ -76,7 +76,7 @@ class SimpleCoctailCategory(TestCase):
 
 class CategoryCRUD(WebTest):
     csrf_checks = False
-    setup_auth = False    
+    setup_auth = False
     def test_add_category(self):
         self.assertEqual(Category.objects.all().count(), 0)
 
@@ -166,3 +166,86 @@ class CategoryCRUD(WebTest):
         
         self.assertEqual(Category.objects.all().count(), 0)
         self.assertEqual(Coctail.objects.all().count(), 0)
+
+
+class IngridientCRU(WebTest):
+    csrf_checks = False
+    setup_auth = False
+
+    def test_ingridient_add(self):
+        self.assertEqual(Ingridient.objects.all().count(), 0)
+        
+        url = reverse('ingridient_add')
+        res = self.app.get(url)
+
+        form = res.form
+        form['value'] = 'Vodka 50g'
+        res = form.submit().follow()
+
+        self.assert_(form['value'].value in res.content)
+        self.assertEqual(Ingridient.objects.all().count(), 1)
+
+    def test_ingridient_list_detail(self):
+        ingridient = Ingridient(value='Vodka 50g')
+        ingridient.save()
+
+        list_res = self.app.get(reverse('ingridients'))
+        url = ingridient.get_absolute_url()
+        self.assert_(url in list_res.content)
+
+        detail_res = self.app.get(url)
+        self.assert_(ingridient.value in detail_res.content)
+    
+    def test_ingridient_edit(self):
+        ingridient = Ingridient(value='Vodka 50g')
+        ingridient.save()
+        self.assertEqual(Ingridient.objects.all().count(), 1)
+        
+        edit_url = ingridient.get_edit_url()
+        res = self.app.get(edit_url)
+        form = res.form
+        self.assertEqual(form['value'].value, ingridient.value)
+        form['value'] = 'Vodka 100g'
+        res = form.submit().follow()
+        self.assert_(form['value'].value in res.content)
+        self.assertEqual(Ingridient.objects.all().count(), 1)
+
+class IngridientsDelete(WebTest):
+    csrf_checks = False
+    setup_auth = False
+    def setUp(self):
+        title = "Vodka based"
+        category = Category(title=title)
+        category.save()
+        coctail = Coctail(title="Pure vodka", category=category)
+        coctail.save()
+        vodka = Ingridient(value="Vodka 100g")
+        vodka.save()
+        coctail.ingridients.add(vodka)
+        coctail.save()
+
+        self.vodka = vodka
+
+        self.assertEqual(Category.objects.all().count(), 1)
+        self.assertEqual(Ingridient.objects.all().count(), 1)
+        self.assertEqual(Coctail.objects.all().count(), 1)
+
+    def test_ingridient_delete_with_coctails(self):
+        del_url = self.vodka.get_delete_url()
+        res = self.app.get(del_url)
+        form = res.forms["delete_with_coctails"]
+        res = form.submit().follow()
+        
+        self.assertEqual(Category.objects.all().count(), 1)
+        self.assertEqual(Ingridient.objects.all().count(), 0)
+        self.assertEqual(Coctail.objects.all().count(), 0)
+
+    def test_ingridient_delete_with_coctails(self):
+        del_url = self.vodka.get_delete_url()
+        res = self.app.get(del_url)
+        form = res.forms["delete_from_coctails"]
+        res = form.submit().follow()
+        
+        self.assertEqual(Category.objects.all().count(), 1)
+        self.assertEqual(Ingridient.objects.all().count(), 0)
+        self.assertEqual(Coctail.objects.all().count(), 1)

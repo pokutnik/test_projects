@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Ingridient: {{ object.value }}{% endblock %}
+
+{% block content %}
+	<h1>Ingridient {{ object.value }}</h1>
+	<a href="{{ object.get_edit_url }}">Edit ingridient</a>
+	<a href="{{ object.get_delete_url }}">Delete ingridient</a>
+	<h2>Used in coctails</h2>
+	<dl>
+		{% for coctail in object.coctails.all %}
+			<dt><a href="{{ coctail.get_absolute_url }}">{{ coctail.title }}</a></dt>
+			<dd>
+				{{ coctail.description }}
+			</dd>				
+		{% endfor %}
+	</dl>
+{% endblock content %}

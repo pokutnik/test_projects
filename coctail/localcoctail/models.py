@@ -3,6 +3,18 @@ from django.db import models
 
 class Ingridient(models.Model):
 	value = models.CharField("Title", max_length=140)
+	@models.permalink
+	def get_absolute_url(self):
+		return 'ingridient', (self.id, )
+
+	@models.permalink
+	def get_edit_url(self):
+		return 'ingridient_edit', (self.id, )
+
+	@models.permalink
+	def get_delete_url(self):
+		return 'ingridient_delete_with_coctails', (self.id, )
+
 
 class Coctail(models.Model):
 	title = models.CharField("Title", max_length=140)

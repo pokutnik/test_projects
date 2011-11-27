@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ object|yesno:"Edit,Create" }} ingridient{% endblock %}
+
+{% block content %}
+	{% if object %}
+		<h1>Edit ingridient</h1>
+	{% else %}
+		<h1>Create new ingridient</h1>
+	{% endif %}
+	<form method="POST" action="">
+		{{ form.as_ul }}
+	</form>
+{% endblock content %}

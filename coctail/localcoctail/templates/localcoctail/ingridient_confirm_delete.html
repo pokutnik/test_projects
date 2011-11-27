@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Delete ingridient: {{ object.value }}{% endblock %}
+
+{% block content %}
+	<h1>Delete ingridient {{ object.value }}?</h1>
+	<p>This ingridient found in coctails:</p>
+	<ul>
+		{% for coctail in object.coctails.all %}
+			<li><a href="{{ coctail.get_absolute_url }}">{{ coctail.title }}</a></li>
+		{% endfor %}
+	</ul>
+	<form id="delete_with_coctails" action="{% url ingridient_delete_with_coctails object.id %}" method="POST">
+		<div>
+			<button type="submit">Delete with coctails</button>
+		</div>
+	</form>
+	<form id="delete_from_coctails" action="{% url ingridient_delete_from_coctails object.id %}" method="POST">
+		<div>
+			<button type="submit">Delete from coctails</button>
+		</div>
+	</form>	
+{% endblock content %}
