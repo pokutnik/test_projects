@@ -4,6 +4,7 @@
 
 {% block content %}
 	<h1>Ingridients list</h1>
+	<a href="{% url ingridient_add %}">Add new ingridient</a>
 	<ul class="ingridients">
 		{% for ingridient in object_list %}
 			<li><a href="{{ ingridient.get_absolute_url }}">{{ ingridient.value }}</a></li>
