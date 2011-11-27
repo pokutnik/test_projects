@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Category: {{ object.title }}{% endblock %}
+
+{% block content %}
+	<h1>{{ object.title }}</h1>
+
+	<dl>
+		{% for coctail in object.coctails.all %}
+			<dt><a href="{{ coctail.get_absolute_url }}">{{ coctail.title }}</a></dt>
+			<dd>
+				{{ coctail.description }}
+			</dd>
+			<dd>
+				Ingridients:
+				<ul>
+				    {% for ingridient in coctail.ingridients.all %}
+						<li>{{ ingridient.title }}</li>
+					{% endfor %}
+				</ul>
+			</dd>
+				
+		{% endfor %}
+	</dl>
+{% endblock content %}

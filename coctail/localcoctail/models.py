@@ -16,3 +16,6 @@ class Coctail(models.Model):
 
 class Category(models.Model):
 	title = models.CharField("Title", max_length=140)
+	@models.permalink
+	def get_absolute_url(self):
+		return 'category', (self.id, )
