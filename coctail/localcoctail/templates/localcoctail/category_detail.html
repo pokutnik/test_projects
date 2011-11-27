@@ -4,7 +4,7 @@
 
 {% block content %}
 	<h1>{{ object.title }}</h1>
-
+	<a href="{{ object.get_edit_url }}">Edit category</a>
 	<dl>
 		{% for coctail in object.coctails.all %}
 			<dt><a href="{{ coctail.get_absolute_url }}">{{ coctail.title }}</a></dt>

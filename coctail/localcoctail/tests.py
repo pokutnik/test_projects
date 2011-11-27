@@ -111,10 +111,24 @@ class CategoryCRUD(WebTest):
         title = "Vodka based"
         category = Category(title=title)
         category.save()
+        self.assertEqual(Category.objects.all().count(), 1)
 
-        url = category.get_edit_url()
+        url = category.get_absolute_url()
         res = self.app.get(url)
+
+        edit_url = category.get_edit_url()
+        self.assert_(edit_url in res.content)
+
+        res = self.app.get(edit_url)
         self.assert_(title in res.content)
         self.assert_("Edit" in res.content)
 
+        form = res.form
+        title += ' edited'
+        form['title'] = title
+        datail_res = form.submit().follow()
 
+        self.assert_(title in datail_res.content)
+        self.assert_(edit_url in datail_res.content)
+
+        self.assertEqual(Category.objects.all().count(), 1)
