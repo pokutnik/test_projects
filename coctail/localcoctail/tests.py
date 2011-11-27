@@ -24,12 +24,12 @@ class ModelsTest(TestCase):
         self.assertEqual(vodka.coctails.all().count(), 1)
 
 
-class CoctailsCrud(TestCase):
+class SimpleCoctailCategory(TestCase):
     def setUp(self):
         self.c = Client()
         self.cat, new = Category.objects.get_or_create(title="Default")
 
-    def test_list_detail(self):
+    def test_coctail_list_detail(self):
         url = reverse('coctails')
         res = self.c.get(url)
         self.assertContains(res, "Coctails list")
@@ -47,13 +47,8 @@ class CoctailsCrud(TestCase):
 
         res = self.c.get(url)
         self.assertContains(res, title)
-        
-
-class CategoryCRUD(TestCase):
-    def setUp(self):
-        self.c = Client()
-    
-    def test_list(self):
+       
+    def test_category_list_detail(self):
         url = reverse('categories')
         res = self.c.get(url)
         self.assertContains(res, "Categories list")
