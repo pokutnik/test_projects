@@ -23,4 +23,10 @@ class Category(models.Model):
 	@models.permalink
 	def get_edit_url(self):
 		return 'category_edit', (self.id, )
+
+	@models.permalink
+	def get_delete_url(self):
+		return 'category_delete', (self.id, )
+
+
 	

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Delete category: {{ object.title }}{% endblock %}
+
+{% block content %}
+	<h1>Delete category {{ object.title }}?</h1>
+	<p>Do you whant delete category with all coctails?</p>
+	<ul>
+		{% for coctail in object.coctails.all %}
+			<li><a href="{{ coctail.get_absolute_url }}">{{ coctail.title }}</a></li>
+		{% endfor %}
+	</ul>
+	<form id="delete_form" action="{{ category.get_delete_url }}" method="POST">
+		<div>
+			<button type="submit">Delete with coctails</button>
+		</div>
+	</form>
+{% endblock content %}

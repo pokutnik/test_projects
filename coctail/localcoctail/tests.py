@@ -132,3 +132,37 @@ class CategoryCRUD(WebTest):
         self.assert_(edit_url in datail_res.content)
 
         self.assertEqual(Category.objects.all().count(), 1)
+
+    def test_delete(self):
+        title = "Vodka based"
+        category = Category(title=title)
+        category.save()
+        self.assertEqual(Category.objects.all().count(), 1)
+
+        url = category.get_absolute_url()
+        res = self.app.get(url)
+
+        del_url = category.get_delete_url()
+        res = self.app.get(del_url)
+        form = res.forms["delete_form"]
+        res = form.submit().follow()
+        self.assertEqual(Category.objects.all().count(), 0)
+
+    def test_delete_with_coctails(self):
+        title = "Vodka based"
+        category = Category(title=title)
+        category.save()
+
+        Coctail(title="Pure vodka", category=category).save()
+        Coctail(title="Only vodka", category=category).save()
+
+        self.assertEqual(Category.objects.all().count(), 1)
+        self.assertEqual(Coctail.objects.all().count(), 2)
+
+        del_url = category.get_delete_url()
+        res = self.app.get(del_url)
+        form = res.forms["delete_form"]
+        res = form.submit().follow()
+        
+        self.assertEqual(Category.objects.all().count(), 0)
+        self.assertEqual(Coctail.objects.all().count(), 0)
