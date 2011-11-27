@@ -19,3 +19,8 @@ class Category(models.Model):
 	@models.permalink
 	def get_absolute_url(self):
 		return 'category', (self.id, )
+
+	@models.permalink
+	def get_edit_url(self):
+		return 'category_edit', (self.id, )
+	

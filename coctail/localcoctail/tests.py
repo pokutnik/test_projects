@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase, Client
+from django_webtest import WebTest
 from django.core.urlresolvers import reverse
 
 from models import Category, Ingridient, Coctail
@@ -72,4 +73,48 @@ class SimpleCoctailCategory(TestCase):
         coctail.save()
         res = self.c.get(url)
         self.assertContains(res, title)
+
+class CategoryCRUD(WebTest):
+    csrf_checks = False
+    setup_auth = False    
+    def test_add_category(self):
+        self.assertEqual(Category.objects.all().count(), 0)
+
+        url = reverse('category_add')
+        res = self.app.get(url)
+        self.assert_("Create" in res.content)
+
+
+        form = res.form
+        form['title'] = 'First category'
+        res = form.submit().follow()
+        self.assert_(form['title'].value in res.content)
+
+        self.assertEqual(Category.objects.all().count(), 1)
+
+        res = self.app.get(url)
+        form['title'] = 'Second category'
+        res = form.submit()
+        res.follow()
+
+        self.assertEqual(Category.objects.all().count(), 2)
+
+    def test_add_empty_title(self):
+        url = reverse('category_add')
+        res = self.app.get(url)
+        form = res.form
+        form['title'] = ''
+        res = form.submit()
+        self.assert_("error" in res.content)
+
+    def test_edit(self):
+        title = "Vodka based"
+        category = Category(title=title)
+        category.save()
+
+        url = category.get_edit_url()
+        res = self.app.get(url)
+        self.assert_(title in res.content)
+        self.assert_("Edit" in res.content)
+
 
