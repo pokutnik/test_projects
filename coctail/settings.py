@@ -105,6 +105,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'django.contrib.staticfiles',
+    'coctailmain',
     'localcoctail',
 )
 
