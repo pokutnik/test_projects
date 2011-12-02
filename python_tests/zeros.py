@@ -103,16 +103,20 @@ def zeros_leading(S):
         0 0 ... 0 0 0
     """
     L = len(S)
-    zl = 0
-    s = 0
-    for i, K in enumerate(S):
-        k = int(K)
+    zl = 0  # zeros count
+    s = 0  # zeros in column  
+    num = 0  # current number
+    revS = S[::-1]  # reversed string
+    
+    for l, K in enumerate(revS):
+        k = int(K)  # current digit
+        i = L - l
         if k == 0:
-            s = int(S[i:] or 0) % modulo + 1
+            s = num + 1
         else:
-            l = L - i - 1
             s = k * l * ten_power[l - 1] + ten_power[l] if l else 1
         zl = zl + s
+        num += k * ten_power[l]
     return zl
 
 
@@ -158,6 +162,7 @@ if __name__ == "__main__":
     assert zeros_leading("22") == 13
     assert zeros_leading("99") == 20
 
+    #assert False
     assert number_of_zeros("1") == 1
     assert number_of_zeros("2") == 1
     assert number_of_zeros("3") == 1
@@ -197,4 +202,10 @@ if __name__ == "__main__":
       number_of_zeros(S)
     """, "from zeros import number_of_zeros; S = '1234567890'*1000")
     print 'time to calculate with L=10000 %f seconds' % t.timeit(1)
-    # ~ 1.5 seconds on i3 processor laptop
+    # ~ 0.03 seconds on i3 processor laptop
+
+    t = timeit.Timer("""
+      number_of_zeros(S)
+    """, "from zeros import number_of_zeros; S = '1234567890'*100000")
+    print 'time to calculate with L=1000000 %f seconds' % t.timeit(1)
+    # ~ 3.5 seconds
