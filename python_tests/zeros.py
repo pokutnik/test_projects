@@ -47,18 +47,16 @@ def number_of_zeros(S):
 
     for l in xrange(L - 1):
         k = int(S[-l - 1])  # current digit
+        lp = l * p10_
         if k == 0:
-            zeros += num + 1
+            zeros += num + 9 * lp + 1
         else:
-            zeros += p10 + k * l * p10_
-        zeros += 9 * l * p10_
+            zeros += p10 + (k+9) * lp 
         num += k * p10
         p10_, p10 = (p10, (p10 * 10) % modulo)
 
-    if L > 1:
-        k = int(S[0])
-        zeros += (k - 1) * (L - 1) * p10_
-
+    l = L - 1
+    zeros += (int(S[0]) - 1) * l * p10_
     return zeros % modulo
 
 
@@ -134,3 +132,9 @@ if __name__ == "__main__":
     """, "from zeros import number_of_zeros; S = '1234567890'*100000")
     print 'time to calculate with L=1000000 %f seconds' % t.timeit(1)
     # ~ 3.5 seconds
+
+    t = timeit.Timer("""
+      number_of_zeros(S)
+    """, "from zeros import number_of_zeros; S = '1234567890'*1000")
+    print 'time to calculate with L=10000 %f seconds' % t.timeit(100)
+    # ~ 0.03 seconds on i3 processor laptop
