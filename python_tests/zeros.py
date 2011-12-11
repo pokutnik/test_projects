@@ -35,50 +35,31 @@ storage required for input arguments).
 
 modulo = 1410000017
 #modulo = 141000001700000000000000000000000
-# here we need remainder as result
-# so we'll tuncate all big numbers by modulo
-
-ten_power = [1]
-
-
-def warmup(n):
-    """
-    Prepare cache table of 10 ** i by modulo
-    to not multiply big numbers
-    """
-
-    if(n > len(ten_power)):
-        d = ten_power[-1]
-        for i in xrange(len(ten_power), n):
-            d *= 10
-            d %= modulo
-            ten_power.append(d)
 
 def number_of_zeros(S):
     L = len(S)
-    warmup(L)
     
-    zl = 0  # zeros count
+    zeros = 1  # zeros count
     s = 0  # zeros in column  
     num = 0  # current number
     
+    p10_, p10 = (0, 1)  # 10^(l-1) and 10^l  divided by modulo
+
     for l in xrange(L - 1):
         k = int(S[-l - 1])  # current digit
         if k == 0:
-            s = num + 1
+            zeros += num + 1
         else:
-            s = k * l * ten_power[l - 1] + ten_power[l] if l else 1
-        num += k * ten_power[l]
+            zeros += p10 + k * l * p10_
+        zeros += 9 * l * p10_
+        num += k * p10
+        p10_, p10 = (p10, (p10 * 10) % modulo)
 
-        zl += s
-        zl += 9 * l * ten_power[l - 1] if l else 0
+    if L > 1:
+        k = int(S[0])
+        zeros += (k - 1) * (L - 1) * p10_
 
-    k = int(S[0])
-    l = L - 1
-    s = (k - 1) * l * ten_power[l - 1] if l else 0
-    part = s + 1
-    total = part + zl
-    return total % modulo
+    return zeros % modulo
 
 
 def direct(S):
@@ -89,8 +70,6 @@ def direct(S):
 
 
 if __name__ == "__main__":
-    warmup(10000)
-
     assert number_of_zeros("1") == 1
     assert number_of_zeros("2") == 1
     assert number_of_zeros("3") == 1
@@ -143,3 +122,15 @@ if __name__ == "__main__":
 
     print "Tests PASSED"
 
+    import timeit
+    t = timeit.Timer("""
+      number_of_zeros(S)
+    """, "from zeros import number_of_zeros; S = '1234567890'*1000")
+    print 'time to calculate with L=10000 %f seconds' % t.timeit(1)
+    # ~ 0.03 seconds on i3 processor laptop
+
+    t = timeit.Timer("""
+      number_of_zeros(S)
+    """, "from zeros import number_of_zeros; S = '1234567890'*100000")
+    print 'time to calculate with L=1000000 %f seconds' % t.timeit(1)
+    # ~ 3.5 seconds
