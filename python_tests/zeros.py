@@ -54,79 +54,30 @@ def warmup(n):
             d %= modulo
             ten_power.append(d)
 
-
-def Z9(l):
-    """
-        Calculate zeros from 0 to l nines, without counting leading zeros
-        Z9(2) = number_of_zeros("99")
-        Z9(3) = number_of_zeros("999")
-
-            1 2 . . . l
-            -----------
-            9 9 . . . 9     \
-                      .     |
-                      .     += z9
-                      .     |
-                      0     /
-
-    """
-    z9 = sum(9 * i * ten_power[i - 1] for i in xrange(1, l)) + 1
-    return z9
-
-
-def zeros_part(k, l):
-    """ zeros (without leading) from "k-1 9 9 9 9 9 9" (l nines) to 0
-        k-1 9 9 9 9 9 9     \
-         .                  |
-         .                  += s
-         .                  |
-         1  0 0 0 0 0 0     /
-            9 9 9 9 9 9     \
-                      .     |
-                      .     += z9
-                      .     |
-                      0     /
-    """
-    assert k > 0
-    s = (k - 1) * l * ten_power[l - 1] if l else 0
-    z9 = Z9(l)
-    return z9 + s
-
-
-def zeros_leading(S):
-    """ Calculate zeros including leading zeros
-
-        0 0 ... x y z
-             .
-             .
-             .
-        0 0 ... 0 0 1
-        0 0 ... 0 0 0
-    """
+def number_of_zeros(S):
     L = len(S)
+    warmup(L)
+    
     zl = 0  # zeros count
     s = 0  # zeros in column  
     num = 0  # current number
-    revS = S[::-1]  # reversed string
     
-    for l, K in enumerate(revS):
-        k = int(K)  # current digit
-        i = L - l
+    for l in xrange(L - 1):
+        k = int(S[-l - 1])  # current digit
         if k == 0:
             s = num + 1
         else:
             s = k * l * ten_power[l - 1] + ten_power[l] if l else 1
-        zl = zl + s
         num += k * ten_power[l]
-    return zl
 
+        zl += s
+        zl += 9 * l * ten_power[l - 1] if l else 0
 
-def number_of_zeros(S):
-    l = len(S) - 1
-    warmup(l)
-    part = zeros_part(int(S[0]), l)
-    leading = zeros_leading(S[1:])
-    total = part + leading
+    k = int(S[0])
+    l = L - 1
+    s = (k - 1) * l * ten_power[l - 1] if l else 0
+    part = s + 1
+    total = part + zl
     return total % modulo
 
 
@@ -139,31 +90,7 @@ def direct(S):
 
 if __name__ == "__main__":
     warmup(10000)
-    assert Z9(0) == 1
-    assert Z9(1) == 1
-    assert Z9(2) == 10
-    assert Z9(3) == 190
-    assert Z9(4) == 2890
 
-    assert zeros_leading("0") == 1
-    assert zeros_leading("1") == 1
-    assert zeros_leading("2") == 1
-    assert zeros_leading("9") == 1
-    assert zeros_leading("00") == 2
-    assert zeros_leading("01") == 3
-    assert zeros_leading("02") == 4
-    assert zeros_leading("03") == 5
-    assert zeros_leading("04") == 6
-    assert zeros_leading("10") == 12
-    assert zeros_leading("11") == 12
-    assert zeros_leading("12") == 12
-    assert zeros_leading("13") == 12
-    assert zeros_leading("20") == 13
-    assert zeros_leading("21") == 13
-    assert zeros_leading("22") == 13
-    assert zeros_leading("99") == 20
-
-    #assert False
     assert number_of_zeros("1") == 1
     assert number_of_zeros("2") == 1
     assert number_of_zeros("3") == 1
