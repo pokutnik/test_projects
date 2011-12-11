@@ -69,7 +69,8 @@ def equi(A):
     """ Calculate any (actualy first one) equilibrium number
         or retunrn -1
     """
-    return all_equi(A).next() or -1
+	result = all_equi(A).next()
+    return result if result != None else -1
 
 
 if __name__ == "__main__":
