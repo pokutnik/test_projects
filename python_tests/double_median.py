@@ -62,7 +62,7 @@ expected worst-case time complexity is O(K*(log(N)+log(M)));
 expected worst-case space complexity is O(K), beyond input storage (not counting the storage required for input arguments).
 Elements of input arrays can be modified.
 """
-from bisect import insort
+
 
 def dummy_double_median(A,B,P,Q,R,S):
     assert len(P) == len(Q)
@@ -82,6 +82,7 @@ def dummy_double_median(A,B,P,Q,R,S):
     print "dm -", r
     return r
 
+from bisect import insort
 big_number = 1000000000000L
 
 def double_median(A,B,P,Q,R,S):
@@ -98,18 +99,9 @@ def double_median(A,B,P,Q,R,S):
 
         i = 0
         j = 0
-        c = None
-        for n in xrange((la + lb) / 2 +1):
-            ai = A[a0 + i] if i < la else big_number
-            bj = B[b0 + j] if j < lb else big_number
-            if ai <= bj:
-                c = ai
-                i += 1
-            else:
-                c = bj
-                j += 1
-        if c != None:
-            insort(C, c)
+        T = sorted(A[a0:a1] + B[b0:b1])
+        c = T[(la+lb)/2]
+        insort(C, c)
 
     r = C[len(C) / 2]
     return r
