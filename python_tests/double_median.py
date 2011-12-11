@@ -74,12 +74,12 @@ def dummy_double_median(A,B,P,Q,R,S):
         L = A[P[i]:Q[i]+1]
         M = B[R[i]:S[i]+1]
         T = sorted(L+M)
-        print "T = ", T
+        #print "T = ", T
         C.append(T[len(T)/2])
-    print "C = ", C
+    #print "C = ", C
     C.sort()
     r = C[len(C) / 2]
-    print "dm -", r
+    #print "dm -", r
     return r
 
 from bisect import insort
@@ -90,21 +90,54 @@ def double_median(A,B,P,Q,R,S):
     assert len(R) == len(S)
     assert len(P) == len(R)
 
+
+    def merge_median(a0, a1, b0, b1):
+        la = a1 - a0 + 1
+        lb = b1 - b0 + 1
+        step = lambda: min(la, lb) /4 * 2
+
+        s = step()
+        #print "Step", step()
+        #print A[a0:a1+1], 'ma=', ma()
+        #print B[b0:b1+1], 'mb=', mb()
+
+        while s > 30:
+            pa = (a1+a0)/2
+            pb = (b1+b0)/2
+            ma = A[pa] if la%2 else (A[pa]+A[pa+1])/2.0
+            mb = B[pb] if lb%2 else (B[pb]+B[pb+1])/2.0
+
+            if ma > mb:
+                a1 -= s
+                b0 += s
+            else:
+                a0 += s
+                b1 -= s
+            la -= s
+            lb -= s
+            s = step()
+            #print "redduce by>", s
+            #print A[a0:a1+1], 'ma=', ma()
+            #print B[b0:b1+1], 'mb=', mb()
+        L = sorted(A[a0:a1+1]+B[b0:b1+1])
+        #print "L=", L
+        return L[len(L)/2]
+
     C = []
     for i in xrange(len(P)):
-        a0, a1 = P[i], Q[i] + 1
-        b0, b1 = R[i], S[i] + 1
+        a0, a1 = P[i], Q[i]
+        b0, b1 = R[i], S[i]
         la = a1 - a0
         lb = b1 - b0
 
         i = 0
         j = 0
-        T = sorted(A[a0:a1] + B[b0:b1])
-        c = T[(la+lb)/2]
+        c = merge_median(a0, a1, b0, b1)
         insort(C, c)
 
     r = C[len(C) / 2]
     return r
+
 
 if __name__ == '__main__':
     
@@ -118,4 +151,91 @@ if __name__ == '__main__':
 
     assert double_median(A, B, P, Q, R, S) == 8
 
-    assert double_median( **{'A': [1, 3, 5, 5], 'B': [2, 4], 'Q': [3, 1, 2], 'P': [1, 0, 0], 'S': [1, 0, 1], 'R': [0, 0, 0]}) == 3
+    assert double_median( **{'A': [1, 3, 5, 5], 'B': [2, 4], 'Q': [3, 1, 2], 'P': [1, 0, 0], 'S': [1, 0, 1], 'R': [0, 0, 0]}) == 3 
+
+    from random import randint
+    import pickle
+    import os    
+    import timeit
+
+
+    def gen(N, K):
+        A = []
+        B = []
+        P = []
+        Q = []
+        R = []
+        S = []
+
+        for i in xrange(N):
+            A.append(randint(1, N*10))
+            B.append(randint(1, N*10))
+        A.sort()
+        B.sort()
+        for i in xrange(K):
+            p = randint(0, N-1)
+            q = randint(p, N-1)
+            r = randint(1, N-1)
+            s = randint(r, N-1)
+            if not( (q-p) + (r-s) % 2 ):
+                r -= 1
+            P.append(p)
+            Q.append(q)
+            R.append(r)
+            S.append(s)
+        return A,B,P,Q,R,S
+
+    ## check correct
+    A,B,P,Q,R,S = gen(10, 10)
+    ddm = dummy_double_median(A, B, P, Q, R, S)
+    dm = double_median(A, B, P, Q, R, S)
+    assert ddm == dm
+
+    A,B,P,Q,R,S = gen(100, 100)
+    ddm = dummy_double_median(A, B, P, Q, R, S)
+    dm = double_median(A, B, P, Q, R, S)
+    assert ddm == dm
+    
+
+    ## 5k run
+
+    fn = 'median_5000.dat'
+    if os.path.exists(fn):
+        with open(fn, 'rb') as f:
+            A,B,P,Q,R,S = pickle.load(f)
+    else:
+        A,B,P,Q,R,S = gen(10000, 5000)
+        with open(fn, 'wb') as f:
+            pickle.dump((A,B,P,Q,R,S), f)
+
+    prep = """
+from double_median import dummy_double_median, double_median
+import pickle
+fn = '%s'
+with open(fn, 'rb') as f:
+    A,B,P,Q,R,S = pickle.load(f)
+"""
+
+
+    t = timeit.Timer("dummy_double_median(A, B, P, Q, R, S)", prep % fn)
+    print 'dummy 5k=%f' % t.timeit(1)
+
+    t = timeit.Timer("double_median(A, B, P, Q, R, S)", prep % fn)
+    print 'step  5k=%f' % t.timeit(1)
+
+
+
+    fn = 'median_10000.dat'
+    if os.path.exists(fn):
+        with open(fn, 'rb') as f:
+            A,B,P,Q,R,S = pickle.load(f)
+    else:
+        A,B,P,Q,R,S = gen(10000, 10000)
+        with open(fn, 'wb') as f:
+            pickle.dump((A,B,P,Q,R,S), f)
+
+    t = timeit.Timer("dummy_double_median(A, B, P, Q, R, S)", prep % fn)
+    print 'dummy 10k=%f' % t.timeit(1)
+
+    t = timeit.Timer("double_median(A, B, P, Q, R, S)", prep % fn)
+    print 'step  10k=%f' % t.timeit(1)
