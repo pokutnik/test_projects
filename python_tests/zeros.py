@@ -34,6 +34,7 @@ storage required for input arguments).
 """
 
 modulo = 1410000017
+#modulo = 141000001700000000000000000000000
 # here we need remainder as result
 # so we'll tuncate all big numbers by modulo
 
@@ -192,20 +193,26 @@ if __name__ == "__main__":
     assert number_of_zeros("9999") == 2890
     assert number_of_zeros("54321") == 21263
     assert number_of_zeros("54331") == 21264
-    assert number_of_zeros("50321225546506999999"
-            "99999989898787987987987989898985") == 1010678350
+
+    assert number_of_zeros('1643407768') == modulo - 1 
+    assert number_of_zeros('1643407769') == 0
+    assert number_of_zeros('1643407770') == 2
+
+    bigS = "1903212065"
+    n_zeros = 1615116639
+    n_zeros_mod = n_zeros % modulo
+    assert number_of_zeros(bigS) == n_zeros_mod
+
+    bigS = "1410000017000000000000000000000"
+    n_zeros = 4186889021588888888888888888916L
+    n_zeros_mod = n_zeros % modulo
+    assert number_of_zeros(bigS) == n_zeros_mod
+
+    bigS = "1410000017000000000000000000001"
+    n_zeros = 4186889021588888888888888888916L + 25 
+    n_zeros_mod = n_zeros % modulo
+    assert number_of_zeros(bigS) == n_zeros_mod
+
 
     print "Tests PASSED"
 
-    import timeit
-    t = timeit.Timer("""
-      number_of_zeros(S)
-    """, "from zeros import number_of_zeros; S = '1234567890'*1000")
-    print 'time to calculate with L=10000 %f seconds' % t.timeit(1)
-    # ~ 0.03 seconds on i3 processor laptop
-
-    t = timeit.Timer("""
-      number_of_zeros(S)
-    """, "from zeros import number_of_zeros; S = '1234567890'*100000")
-    print 'time to calculate with L=1000000 %f seconds' % t.timeit(1)
-    # ~ 3.5 seconds
