@@ -78,8 +78,7 @@ def dummy_double_median(A,B,P,Q,R,S):
         C.append(T[len(T)/2])
     #print "C = ", C
     C.sort()
-    r = C[len(C) / 2]
-    #print "dm -", r
+    r = C[len(C) / 2
     return r
 
 from bisect import insort
